@@ -2,7 +2,7 @@
     CC=gcc
     BDIR=build
 
-bcat:
+main:
     mkdir -p {{BDIR}}/
     !{{CC}} -o {{BDIR}}/cccat ./cccat.c -Wall
 

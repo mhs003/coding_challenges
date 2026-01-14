@@ -10,6 +10,7 @@
 bool hasPrefix(const char *pre, const char *str);
 bool array_contains_str(char *arr[], char *target);
 void readFile(int *line, char *name, char *flags[]);
+void stdReader(int *line, FILE *fptr, char *flags[]);
 // ----
 
 int main(int argc, char *argv[])
@@ -53,17 +54,25 @@ int main(int argc, char *argv[])
     files[filepos] = NULL;
     flags[flagpos] = NULL;
 
-    for (int i = 0; files[i] != NULL; i++)
+    if (filepos > 0)
     {
-        if (strlen(files[i]) == 0)
-            continue;
-        readFile(&line, files[i], flags);
+        for (int i = 0; files[i] != NULL; i++)
+        {
+            if (strlen(files[i]) == 0)
+
+                continue;
+            readFile(&line, files[i], flags);
+        }
+    }
+    else
+    {
+        stdReader(&line, stdin, flags);
     }
 
     return 0;
 }
 
-// function implementations
+// signature implementations
 bool hasPrefix(const char *pre, const char *str)
 {
     return strncmp(pre, str, strlen(pre)) == 0;
@@ -72,8 +81,10 @@ bool hasPrefix(const char *pre, const char *str)
 bool array_contains_str(char *arr[], char *target)
 {
     int i = 0;
-    while(arr[i] != NULL) {
-        if (strcmp(arr[i], target) == 0) {
+    while (arr[i] != NULL)
+    {
+        if (strcmp(arr[i], target) == 0)
+        {
             return true;
         }
         i++;
@@ -92,29 +103,54 @@ void readFile(int *line, char *name, char *flags[])
         exit(EXIT_FAILURE);
     }
 
+    stdReader(line, fptr, flags);
+}
+
+void stdReader(int *line, FILE *fptr, char *flags[])
+{
     size_t buff_size = 4096;
 
     char buffer[buff_size];
 
     bool linenum_enabled = false;
+    bool number_nonblank = false;
 
     if (array_contains_str(flags, "-n"))
     {
+        buff_size = buff_size + 32;
         linenum_enabled = true;
+    }
+    if (array_contains_str(flags, "-b"))
+    {
+        number_nonblank = true;
     }
 
     int iline = *line;
 
     while (fgets(buffer, sizeof buffer, fptr))
     {
-        if(linenum_enabled) {
-            char out[buff_size + 32];
-            snprintf(out, sizeof out, "%6d  %s", iline, buffer);
-            fputs(out, stdout);
+        char lout[buff_size];
+        if (linenum_enabled)
+        {
+            char out[buff_size];
+            if (!number_nonblank && buffer[0] != '\n')
+            {
+                strcpy(lout, buffer);
+            }
+            else
+            {
+                snprintf(out, sizeof out, "%6d  %s", iline, buffer);
+                strcpy(lout, out);
+            }
         }
         else
         {
-            fputs(buffer, stdout);
+            strcpy(lout, buffer);
+        }
+        fputs(lout, stdout);
+        if (number_nonblank && lout[0] == '\n')
+        {
+            continue;
         }
         iline++;
     }
