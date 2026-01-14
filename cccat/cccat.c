@@ -130,10 +130,10 @@ void stdReader(int *line, FILE *fptr, char *flags[])
     while (fgets(buffer, sizeof buffer, fptr))
     {
         char lout[buff_size];
-        if (linenum_enabled)
+        if (linenum_enabled || number_nonblank)
         {
             char out[buff_size];
-            if (!number_nonblank && buffer[0] != '\n')
+            if (number_nonblank && buffer[0] == '\n')
             {
                 strcpy(lout, buffer);
             }

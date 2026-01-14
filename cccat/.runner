@@ -9,3 +9,23 @@ main:
 cat:
     @ bcat
     !{{BDIR}}/cccat {{1}}
+
+
+test1:
+    ./build/cccat test.txt
+
+test2:
+    head -n1 test.txt | ./build/cccat -
+
+test3:
+    ./build/cccat test.txt test2.txt
+
+test4:
+    head -n3 test.txt | ./build/cccat -n
+
+test5:
+    sed G test.txt | ./build/cccat -n | head -n4
+
+test6:
+    sed G test.txt | ./build/cccat -b | head -n5
+
