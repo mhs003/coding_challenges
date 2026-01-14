@@ -1,0 +1,11 @@
+@vars:
+    CC=gcc
+    BDIR=build
+
+bcat:
+    mkdir -p {{BDIR}}/
+    !{{CC}} -o {{BDIR}}/cccat ./cccat.c -Wall
+
+cat:
+    @ bcat
+    !{{BDIR}}/cccat {{1}}
