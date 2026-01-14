@@ -9,7 +9,7 @@
 // signatures
 bool hasPrefix(const char *pre, const char *str);
 bool array_contains_str(char *arr[], char *target);
-void readFile(char *name, char *flags[]);
+void readFile(int *line, char *name, char *flags[]);
 // ----
 
 int main(int argc, char *argv[])
@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     int flagpos = 0;
     char *files[MAX_FILES];
     int filepos = 0;
+    int line = 1;
 
     for (int i = 0; i < argc; i++)
     {
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
     {
         if (strlen(files[i]) == 0)
             continue;
-        readFile(files[i], flags);
+        readFile(&line, files[i], flags);
     }
 
     return 0;
@@ -70,17 +71,17 @@ bool hasPrefix(const char *pre, const char *str)
 
 bool array_contains_str(char *arr[], char *target)
 {
-    for (int i = 0; arr[i] != NULL; i++)
-    {
-        if (arr[i] == target)
-        {
+    int i = 0;
+    while(arr[i] != NULL) {
+        if (strcmp(arr[i], target) == 0) {
             return true;
         }
+        i++;
     }
     return false;
 }
 
-void readFile(char *name, char *flags[])
+void readFile(int *line, char *name, char *flags[])
 {
     FILE *fptr;
 
@@ -95,21 +96,30 @@ void readFile(char *name, char *flags[])
 
     char buffer[buff_size];
 
-    int line = 1;
+    bool linenum_enabled = false;
+
+    if (array_contains_str(flags, "-n"))
+    {
+        linenum_enabled = true;
+    }
+
+    int iline = *line;
+
     while (fgets(buffer, sizeof buffer, fptr))
     {
-        if (array_contains_str(flags, "-n"))
-        {
+        if(linenum_enabled) {
             char out[buff_size + 32];
-            snprintf(out, sizeof out, "%6d  %s", line, buffer);
+            snprintf(out, sizeof out, "%6d  %s", iline, buffer);
             fputs(out, stdout);
         }
         else
         {
             fputs(buffer, stdout);
         }
-        line++;
+        iline++;
     }
+
+    *line = iline;
 
     fclose(fptr);
 }
